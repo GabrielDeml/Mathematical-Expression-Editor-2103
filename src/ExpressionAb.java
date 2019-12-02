@@ -1,24 +1,30 @@
+
+
 import java.util.List;
 
-public class MultiplicativeExpression implements CompoundExpression {
-    /**
-     * Adds the specified expression as a child.
-     *
-     * @param subexpression the child expression to add
-     */
-    @Override
-    public void addSubexpression(Expression subexpression) {
+abstract class ExpressionAb implements Expression {
 
-    }
+    /**
+     * Parent node
+     */
+    CompoundExpression parent;
+    /**
+     * Value
+     */
+    String value;
+
+    /**
+     * Children
+     */
+    List<Expression> children;
 
     /**
      * Returns the expression's parent.
-     *
      * @return the expression's parent
      */
     @Override
     public CompoundExpression getParent() {
-        return null;
+        return this.parent;
     }
 
     /**
@@ -28,7 +34,15 @@ public class MultiplicativeExpression implements CompoundExpression {
      */
     @Override
     public void setParent(CompoundExpression parent) {
+        this.parent = parent;
+    }
 
+    /**
+     * Sets the parent be the specified expression.
+     * @param children the CompoundExpression that should be the parent of the target object
+     */
+    public void setChildren(List<Expression> children) {
+        this.children = children;
     }
 
     /**
@@ -40,6 +54,7 @@ public class MultiplicativeExpression implements CompoundExpression {
      */
     @Override
     public Expression deepCopy() {
+        //TODO implement me
         return null;
     }
 
@@ -52,7 +67,7 @@ public class MultiplicativeExpression implements CompoundExpression {
      */
     @Override
     public void flatten() {
-
+        //TODO implement me
     }
 
     /**
@@ -63,7 +78,7 @@ public class MultiplicativeExpression implements CompoundExpression {
      */
     @Override
     public String getValue() {
-        return "*";
+        return this.value;
     }
 
     /**
@@ -71,6 +86,6 @@ public class MultiplicativeExpression implements CompoundExpression {
      */
     @Override
     public List<Expression> getChildren() {
-        return null;
+        return this.children;
     }
 }

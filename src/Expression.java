@@ -1,5 +1,3 @@
-import java.util.List;
-
 interface Expression {
     /**
      * Returns the expression's parent.
@@ -40,22 +38,18 @@ interface Expression {
      * @param stringBuilder the StringBuilder to use for building the String representation
      * @param indentLevel   the indentation level (number of tabs from the left margin) at which to start
      */
-    default void convertToString(StringBuilder stringBuilder, int indentLevel) {
-		// add self
-		indent(stringBuilder, indentLevel);
-		stringBuilder.append(getValue()).append('\n');
-		// add children
-		for (Expression e : getChildren()) e.convertToString(stringBuilder, indentLevel + 1);
-    }
+    void convertToString(StringBuilder stringBuilder, int indentLevel);
 
+    /**
+     * Calls the convertToString implementation
+     *
+     * @param indentLevel how far to start indenting each line (0 to have no starting white space)
+     * @return the String representation of this Expression
+     */
     default String convertToString(int indentLevel) {
         final StringBuilder stringBuilder = new StringBuilder();
         convertToString(stringBuilder, indentLevel);
         return stringBuilder.toString();
-    }
-
-    default String convertToString() {
-        return convertToString(0);
     }
 
     /**
@@ -68,17 +62,4 @@ interface Expression {
     static void indent(StringBuilder stringBuilder, int indentLevel) {
         for (int i = 0; i < indentLevel; i++) stringBuilder.append('\t');
     }
-
-    /**
-     * Returns the value associated with this expression
-     * For multiplication, this would be *, for addition, this would be +, and for a literal, this would be toString()
-     *
-     * @return the value of this expression (excluding its children, if any)
-     */
-    String getValue();
-
-    /**
-     * @return this expression's children. Empty list for none.
-     */
-    List<Expression> getChildren();
 }

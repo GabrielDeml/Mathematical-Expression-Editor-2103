@@ -1,25 +1,14 @@
-
-
 import java.util.List;
 
 abstract class ExpressionAb implements Expression {
-
     /**
-     * Parent node
+     * Parent expression
      */
-    CompoundExpression parent;
-    /**
-     * Value
-     */
-    String value;
-
-    /**
-     * Children
-     */
-    List<Expression> children;
+    private CompoundExpression parent;
 
     /**
      * Returns the expression's parent.
+     *
      * @return the expression's parent
      */
     @Override
@@ -38,37 +27,9 @@ abstract class ExpressionAb implements Expression {
     }
 
     /**
-     * Sets the parent be the specified expression.
-     * @param children the CompoundExpression that should be the parent of the target object
+     * @return this expression's children. Empty list for none.
      */
-    public void setChildren(List<Expression> children) {
-        this.children = children;
-    }
-
-    /**
-     * Creates and returns a deep copy of the expression.
-     * The entire tree rooted at the target node is copied, i.e.,
-     * the copied Expression is as deep as possible.
-     *
-     * @return the deep copy
-     */
-    @Override
-    public Expression deepCopy() {
-        //TODO implement me
-        return null;
-    }
-
-    /**
-     * Recursively flattens the expression as much as possible
-     * throughout the entire tree. Specifically, in every multiplicative
-     * or additive expression x whose first or last
-     * child c is of the same type as x, the children of c will be added to x, and
-     * c itself will be removed. This method modifies the expression itself.
-     */
-    @Override
-    public void flatten() {
-        //TODO implement me
-    }
+    public abstract List<Expression> getChildren();
 
     /**
      * Returns the value associated with this expression
@@ -76,16 +37,43 @@ abstract class ExpressionAb implements Expression {
      *
      * @return the value of this expression (excluding its children, if any)
      */
+    public abstract String getValue();
+
+    /**
+     * Recursively flattens the expression as much as possible
+     * throughout the entire tree. Specifically, in every multiplicative
+     * or additive expression x whose first or last
+     * child c is of the same type as x, the children of c will be added to x, and
+     * c itself will be removed. This method modifies the expression itself.
+     * NOTE: ALL OVERRIDES MUST CALL SUPER AT END!!!
+     */
     @Override
-    public String getValue() {
-        return this.value;
+    public void flatten() {
+        for (Expression expression : getChildren()) expression.flatten();
     }
 
     /**
-     * @return this expression's children. Empty list for none.
+     * Creates a String representation by recursively printing out (using indentation) the
+     * tree represented by this expression, starting at the specified indentation level.
+     *
+     * @param stringBuilder the StringBuilder to use for building the String representation
+     * @param indentLevel   the indentation level (number of tabs from the left margin) at which to start
      */
     @Override
-    public List<Expression> getChildren() {
-        return this.children;
+    public void convertToString(StringBuilder stringBuilder, int indentLevel) {
+        // add self
+        Expression.indent(stringBuilder, indentLevel);
+        stringBuilder.append(getValue()).append('\n');
+        // add children
+        for (Expression e : getChildren()) e.convertToString(stringBuilder, indentLevel + 1);
+    }
+
+    /**
+     * Convenience method for convertToString(int) with no starting indent
+     *
+     * @return the String representation of this Expression with no starting indent
+     */
+    public String convertToString() {
+        return convertToString(0);
     }
 }

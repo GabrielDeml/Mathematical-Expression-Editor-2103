@@ -1,20 +1,14 @@
-import java.util.Collections;
 import java.util.List;
 
-public class ParentheticalExpression extends ExpressionAb {
-    private Expression child;
-
-    public ParentheticalExpression(CompoundExpression parent, Expression child) {
-        setParent(parent);
-        this.child = child;
-    }
-
+public class AdditiveExpression extends CompoundExpressionAb {
     /**
-     * @return this expression's children. Empty list for none.
+     * Constructor for a CompoundExpression
+     *
+     * @param parent   the parent of this Expression
+     * @param children the children of this Expression
      */
-    @Override
-    public List<Expression> getChildren() {
-        return Collections.singletonList(child);
+    public AdditiveExpression(CompoundExpression parent, List<Expression> children) {
+        super(parent, children);
     }
 
     /**
@@ -25,7 +19,7 @@ public class ParentheticalExpression extends ExpressionAb {
      */
     @Override
     public String getValue() {
-        return "()";
+        return "+";
     }
 
     /**
@@ -39,6 +33,6 @@ public class ParentheticalExpression extends ExpressionAb {
     public Expression deepCopy() {
         // fixme null as parent won't work -- perhaps go through tree at end of deepCopy and fix dependencies?
         //  (in all impls)
-        return new ParentheticalExpression(null, child.deepCopy());
+        return new AdditiveExpression(null, deepCopyChildren());
     }
 }

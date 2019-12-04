@@ -28,7 +28,6 @@ public class MultiplicativeExpression extends CompoundExpressionAb {
      * or additive expression x whose first or last
      * child c is of the same type as x, the children of c will be added to x, and
      * c itself will be removed. This method modifies the expression itself.
-     * NOTE: ALL OVERRIDES MUST CALL SUPER AT END!!!
      */
     @Override
     public void flatten() {
@@ -50,8 +49,6 @@ public class MultiplicativeExpression extends CompoundExpressionAb {
      */
     @Override
     public Expression deepCopy() {
-        // fixme null as parent won't work -- perhaps go through tree at end of deepCopy and fix dependencies?
-        //  (in all impls)
         return new MultiplicativeExpression(null, deepCopyChildren());
     }
 }

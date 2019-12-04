@@ -1,20 +1,17 @@
-import java.util.Collections;
-import java.util.List;
-
 public class LiteralExpression extends ExpressionAb {
+    /**
+     * The value of this LiteralExpression
+     */
     private String value;
 
+    /**
+     * Constructs a LiteralExpression with the given parent and value
+     * @param parent the parent of this LiteralExpression
+     * @param value the value of this LiteralExpression
+     */
     public LiteralExpression(CompoundExpression parent, String value) {
         setParent(parent);
         this.value = value;
-    }
-
-    /**
-     * @return this expression's children. Empty list for none.
-     */
-    @Override
-    public List<Expression> getChildren() {
-        return Collections.emptyList();
     }
 
     /**
@@ -37,8 +34,17 @@ public class LiteralExpression extends ExpressionAb {
      */
     @Override
     public Expression deepCopy() {
-        // fixme null as parent won't work -- perhaps go through tree at end of deepCopy and fix dependencies?
-        //  (in all impls)
         return new LiteralExpression(null, value);
+    }
+
+    /**
+     * Recursively flattens the expression as much as possible
+     * throughout the entire tree. Specifically, in every multiplicative
+     * or additive expression x whose first or last
+     * child c is of the same type as x, the children of c will be added to x, and
+     * c itself will be removed. This method modifies the expression itself.
+     */
+    @Override
+    public void flatten() {
     }
 }

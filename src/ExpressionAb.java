@@ -1,5 +1,3 @@
-import java.util.List;
-
 abstract class ExpressionAb implements Expression {
     /**
      * Parent expression
@@ -27,11 +25,6 @@ abstract class ExpressionAb implements Expression {
     }
 
     /**
-     * @return this expression's children. Empty list for none.
-     */
-    public abstract List<Expression> getChildren();
-
-    /**
      * Returns the value associated with this expression
      * For multiplication, this would be *, for addition, this would be +, and for a literal, this would be toString()
      *
@@ -40,21 +33,9 @@ abstract class ExpressionAb implements Expression {
     public abstract String getValue();
 
     /**
-     * Recursively flattens the expression as much as possible
-     * throughout the entire tree. Specifically, in every multiplicative
-     * or additive expression x whose first or last
-     * child c is of the same type as x, the children of c will be added to x, and
-     * c itself will be removed. This method modifies the expression itself.
-     * NOTE: ALL OVERRIDES MUST CALL SUPER AT END!!!
-     */
-    @Override
-    public void flatten() {
-        getChildren().forEach(Expression::flatten);
-    }
-
-    /**
      * Creates a String representation by recursively printing out (using indentation) the
      * tree represented by this expression, starting at the specified indentation level.
+     * NOTE: ALL OVERRIDES MUST CALL SUPER FIRST (to add self)!!!
      *
      * @param stringBuilder the StringBuilder to use for building the String representation
      * @param indentLevel   the indentation level (number of tabs from the left margin) at which to start
@@ -64,8 +45,6 @@ abstract class ExpressionAb implements Expression {
         // add self
         Expression.indent(stringBuilder, indentLevel);
         stringBuilder.append(getValue()).append('\n');
-        // add children
-        for (Expression e : getChildren()) e.convertToString(stringBuilder, indentLevel + 1);
     }
 
     /**

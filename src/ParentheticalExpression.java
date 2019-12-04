@@ -1,20 +1,33 @@
 import java.util.Collections;
 import java.util.List;
 
-public class ParentheticalExpression extends ExpressionAb {
-    private Expression child;
-
+public class ParentheticalExpression extends CompoundExpressionAb {
+    /**
+     * Constructs a ParentheticalExpression
+     * @param parent this ParentheticalExpression's parent
+     * @param child the child of this ParentheticalExpression
+     */
     public ParentheticalExpression(CompoundExpression parent, Expression child) {
-        setParent(parent);
-        this.child = child;
+        super(parent, Collections.singletonList(child));
     }
 
     /**
-     * @return this expression's children. Empty list for none.
+     * An override to allow only one child
+     * @param subexpression the child expression to add
      */
     @Override
-    public List<Expression> getChildren() {
-        return Collections.singletonList(child);
+    public void addSubexpression(Expression subexpression) {
+        super.setChildren(Collections.singletonList(subexpression));
+    }
+
+    /**
+     * An override to allow only one child
+     * @param children the new children of this CompoundExpression
+     */
+    @Override
+    public void setChildren(List<Expression> children) {
+        // Ignore all children except for the first
+        if (!children.isEmpty()) addSubexpression(children.get(0));
     }
 
     /**
@@ -37,8 +50,6 @@ public class ParentheticalExpression extends ExpressionAb {
      */
     @Override
     public Expression deepCopy() {
-        // fixme null as parent won't work -- perhaps go through tree at end of deepCopy and fix dependencies?
-        //  (in all impls)
-        return new ParentheticalExpression(null, child.deepCopy());
+        return new ParentheticalExpression(null, deepCopyChildren().get(0));
     }
 }

@@ -1,4 +1,6 @@
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 public class AdditiveExpression extends CompoundExpressionAb {
     /**
@@ -20,6 +22,25 @@ public class AdditiveExpression extends CompoundExpressionAb {
     @Override
     public String getValue() {
         return "+";
+    }
+
+    /**
+     * Recursively flattens the expression as much as possible
+     * throughout the entire tree. Specifically, in every multiplicative
+     * or additive expression x whose first or last
+     * child c is of the same type as x, the children of c will be added to x, and
+     * c itself will be removed. This method modifies the expression itself.
+     * NOTE: ALL OVERRIDES MUST CALL SUPER AT END!!!
+     */
+    @Override
+    public void flatten() {
+        for (int i = 0; i < getChildren().size(); ++i) {
+            if (getChildren().get(i) instanceof AdditiveExpression) {
+                final AdditiveExpression child = (AdditiveExpression) getChildren().remove(i--);
+                child.getChildren().forEach(this::addSubexpression);
+            }
+        }
+        super.flatten();
     }
 
     /**

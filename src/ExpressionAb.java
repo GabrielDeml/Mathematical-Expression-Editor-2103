@@ -49,7 +49,7 @@ abstract class ExpressionAb implements Expression {
      */
     @Override
     public void flatten() {
-        for (Expression expression : getChildren()) expression.flatten();
+        getChildren().forEach(Expression::flatten);
     }
 
     /**

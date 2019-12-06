@@ -1,3 +1,14 @@
+import javafx.beans.binding.ListExpression;
+import javafx.scene.Parent;
+
+import javax.swing.text.html.parser.Parser;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+
+
 /**
  * Starter code to implement an ExpressionParser. Your parser methods should use the following grammar:
  * E := A | X
@@ -37,8 +48,60 @@ public class SimpleExpressionParser implements ExpressionParser {
      */
     protected Expression parseExpression(String str) {
         Expression expression;
-
-        // TODO implement me
+        parE(str);
+        /**
+         * Grammar:
+         * E → A | X
+         * A → A+M | M
+         * M → M*M | X
+         * X → (E) | L
+         * L → [a-z] | [0-9]+
+         */
         return null;
     }
+
+    private boolean parE(String str) {
+        if (parA(str)) {
+            return true;
+        }
+        return parX(str);
+    }
+
+    private boolean parA(String str) {
+        if (parseHelper(str, '+', this::parA, this::parM)) {
+            return true;
+        }
+        return parM(str);
+    }
+
+    private boolean parM(String str) {
+        if (parseHelper(str, '*', this::parM, this::parM)) {
+            return true;
+        }
+        return parX(str);
+    }
+
+    private boolean parX(String str) {
+        //noinspection ConstantConditions
+        if (str.charAt(0) == '(' &&
+                str.charAt(str.length()) == ')' &&
+                parE(str.substring(1, str.length() - 1))) {
+            return true;
+        }
+        return parL(str);
+    }
+
+    private boolean parL(String str){
+        return Character.isLetter(str.charAt(0)) || Character.isDigit(str.charAt(0));
+    }
+
+    private boolean parseHelper(String str, char op, Function<String, Boolean> f1, Function<String, Boolean> f2) {
+        for (int i = 1; i < str.length() - 1; i++) {
+            if (str.charAt(i) == op && f1.apply(str.substring(0, i)) && f2.apply(str.substring(i + 1))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

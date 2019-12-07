@@ -148,35 +148,24 @@ public class SimpleExpressionParser implements ExpressionParser {
 
     /**
      * Attempts to parse the specified string into an Expression
+     * Grammar:
+     * - E → P | L | A | M
+     * - P → (E)
+     * - L → [a-z] | [0-9]+ | -[0-9]+
+     * - A → E+E
+     * - M → E*E
      *
      * @param str the string to attempt to parse
      * @return null if could not parse str, the associated Expression otherwise
      */
     protected Expression parseExpressionNewCFG(String str) {
-        /*
-         * Grammar:
-         * E → P | L | A | M
-         * P → (E)
-         * L → [a-z] | [0-9]+ | -[0-9]+
-         * A → E+E
-         * M → E*E
-         */
-
-        /* todo
-        Note: I have a feeling that arranging the order these parse methods are called in
-                will change whether order of operations is followed.
-
-        We can experiment with different orders of parse_() calls to get order of operations
-           to be correct (if it isn't already, which I think it is)
-         */
-
         // See if it is a literal expression
         Expression exp = parseL(str);
         if (exp != null) return exp;
         // See if it is a parenthetical expression
         exp = parseP(str);
         if (exp != null) return exp;
-        // See if it is an additive expression (THIS MUST BE BEFORE parseM TO KEEP ORDER OF OPERATIONS!!!)
+        // See if it is an additive expression (THIS MUST BE BEFORE parseM TO KEEP ORDER OF OPERATIONS CORRECT!!!)
         exp = parseA(str);
         if (exp != null) return exp;
         // See if it is a multiplicative expression (if it isn't, this will return null)
@@ -184,13 +173,13 @@ public class SimpleExpressionParser implements ExpressionParser {
     }
 
     private Expression parseP(String exp) {
-        // If exp is bounded by parens, return a ParentheticalExpression, null otherwise
+        // Check to see if exp is bounded by parens
         if (Pattern.compile("\\(.*\\)").matcher(exp).matches()) {
             // Check to see if what is inside the parens is an expression or not
             final Expression insides = parseExpressionNewCFG(exp.substring(1, exp.length() - 1));
             if (insides != null) return new ParentheticalExpression(insides);
         }
-        return null;
+        return null; // Either not bounded by parens or insides of parens not an expression
     }
 
     private Expression parseL(String exp) {
@@ -220,10 +209,5 @@ public class SimpleExpressionParser implements ExpressionParser {
         List<Expression> children = parseGenericOperation(exp, '*');
         if (children == null) return null;
         return new MultiplicativeExpression(children);
-    }
-
-    public static void main(String[] args) throws ExpressionParseException {
-        final String expressionStr = "(x+(x)+(x+x)+x)";
-        new SimpleExpressionParser().parse(expressionStr, false);
     }
 }

@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-
+import java.util.regex.Pattern;
 
 /**
  * Starter code to implement an ExpressionParser. Your parser methods should use the following grammar:
@@ -57,14 +57,14 @@ public class SimpleExpressionParser implements ExpressionParser {
     }
 
     private Expression parE(String str) {
-        List<Expression> A = parA(str);
-        if (A != null) {
-            return new AdditiveExpression(A);
-        }
-        List<Expression> X = parX(str);
-        if (X != null) {
-            return new ParentheticalExpression(X.get(0));
-        }
+        // Try first production rule (E → A)
+        final List<Expression> A = parA(str);
+        if (A != null) return new AdditiveExpression(A);
+        // Try second production rule (E → X)
+        final List<Expression> X = parX(str);
+        // todo this does not look right...
+        if (X != null) return new ParentheticalExpression(X.get(0));
+        // Doesn't match CFG:
         return null;
     }
 
@@ -89,7 +89,7 @@ public class SimpleExpressionParser implements ExpressionParser {
             //TODO Get rid tmp after it works
             Expression tmp1 = node.get(0);
             Expression tmp2 = node.get(1);
-             return makeMultiplicativeExpression(new ArrayList<Expression>(Arrays.asList(tmp1, tmp2)));
+            return makeMultiplicativeExpression(new ArrayList<Expression>(Arrays.asList(tmp1, tmp2)));
         }
         List<Expression> X = parX(str);
         if (X != null && X.get(0) != null) {
@@ -99,7 +99,7 @@ public class SimpleExpressionParser implements ExpressionParser {
     }
 
     private List<Expression> parX(String str) {
-        if ( str.length() > 2 && str.charAt(0) == '(' && str.charAt(str.length() - 1) == ')') {
+        if (str.length() > 2 && str.charAt(0) == '(' && str.charAt(str.length() - 1) == ')') {
             Expression E = parE(str.substring(1, str.length() - 1));
             if (E != null) {
                 return makeParentheticalExpression(E);
@@ -113,7 +113,7 @@ public class SimpleExpressionParser implements ExpressionParser {
     }
 
     private List<Expression> parL(String str) {
-        for(int i = 0; i < str.length(); i++){
+        for (int i = 0; i < str.length(); i++) {
             if (!(Character.isLetter(str.charAt(i)) || Character.isDigit(str.charAt(i)))) {
                 return null;
             }
@@ -133,21 +133,101 @@ public class SimpleExpressionParser implements ExpressionParser {
         return null;
     }
 
-    private List<Expression>makeLiteralExpression(String value){
-        return new ArrayList<Expression>(Arrays.asList( new LiteralExpression(value)));
+    private List<Expression> makeLiteralExpression(String value) {
+        return new ArrayList<Expression>(Arrays.asList(new LiteralExpression(value)));
     }
 
-    private List<Expression>makeAdditiveExpression(List<Expression> children){
-        return new ArrayList<Expression>(Arrays.asList( new AdditiveExpression(children)));
+    private List<Expression> makeAdditiveExpression(List<Expression> children) {
+        return new ArrayList<Expression>(Arrays.asList(new AdditiveExpression(children)));
     }
 
-    private List<Expression>makeMultiplicativeExpression(List<Expression> children){
-        return new ArrayList<Expression>(Arrays.asList( new MultiplicativeExpression(children)));
+    private List<Expression> makeMultiplicativeExpression(List<Expression> children) {
+        return new ArrayList<Expression>(Arrays.asList(new MultiplicativeExpression(children)));
     }
 
-    private List<Expression>makeParentheticalExpression(Expression child){
-        return new ArrayList<Expression>(Arrays.asList( new ParentheticalExpression(child)));
+    private List<Expression> makeParentheticalExpression(Expression child) {
+        return new ArrayList<Expression>(Arrays.asList(new ParentheticalExpression(child)));
     }
 
+    /*
+
+    CUSTOM CFG BELOW
+
+     */
+
+    /**
+     * Attempts to parse the specified string into an Expression
+     *
+     * @param str the string to attempt to parse
+     * @return null if could not parse str, the associated Expression otherwise
+     */
+    protected Expression parseExpressionNewCFG(String str) {
+        /*
+         * Grammar:
+         * E → P | L | A | M
+         * P → (E)
+         * L → [a-z] | [0-9]+ | -[0-9]+
+         * A → E+E
+         * M → E*E
+         */
+
+        /* todo
+        Note: I have a feeling that arranging the order these parse methods are called in
+                will change whether order of operations is followed.
+
+        We can experiment with different orders of parse_() calls to get order of operations
+           to be correct (if it isn't already)
+         */
+
+        // See if it is a literal expression
+        Expression exp = parseL(str);
+        if (exp != null) return exp;
+        // See if it is a parenthetical expression
+        exp = parseP(str);
+        if (exp != null) return exp;
+        // See if it is an additive expression (THIS MUST BE BEFORE parseM TO KEEP ORDER OF OPERATIONS!!!)
+        exp = parseA(str);
+        if (exp != null) return exp;
+        // See if it is a multiplicative expression (if it isn't, this will return null)
+        return parseM(str);
+    }
+
+    private Expression parseP(String exp) {
+        // If exp is bounded by parens, return a ParentheticalExpression, null otherwise
+        if (exp.length() >= 2 && exp.charAt(0) == '(' && exp.charAt(exp.length() -1) == ')') {
+            return new ParentheticalExpression(parseExpressionNewCFG(exp.substring(1, exp.length() - 1)));
+        }
+        return null;
+    }
+
+    private Expression parseL(String exp) {
+        // Return a literal expression if exp is matches the necessary regex, null otherwise
+        return (Pattern.compile("[a-z]|(-?[0-9]+)").matcher(exp).matches()) ? new LiteralExpression(exp) : null;
+    }
+
+    private List<Expression> parseGenericOperation(String exp, char operation) {
+        // Find index of the operation (if it is in the string)
+        final int index = exp.indexOf(operation);
+        // If operation isn't in string or string ends in operation, quit
+        if (index < 0 || index >= exp.length() - 1) return null;
+        final Expression exp1 = parseExpressionNewCFG(exp.substring(0, index)),
+                exp2 = parseExpressionNewCFG(exp.substring(index + 1));
+        // If both sides are valid expressions, return them as a list
+        if (exp1 != null && exp2 != null) return Arrays.asList(exp1, exp2);
+        // Else (one or more sides was not a valid expression), return null
+        return null;
+    }
+
+    private Expression parseA(String exp) {
+        List<Expression> children = parseGenericOperation(exp, '+');
+        if (children == null) return null;
+        return new AdditiveExpression(children);
+    }
+
+    private Expression parseM(String exp) {
+        List<Expression> children = parseGenericOperation(exp, '*');
+        if (children == null) return null;
+        return new MultiplicativeExpression(children);
+    }
 
 }

@@ -99,7 +99,6 @@ public class SimpleExpressionParser implements ExpressionParser {
     }
 
     private List<Expression> parX(String str) {
-
         if ( str.length() > 2 && str.charAt(0) == '(' && str.charAt(str.length() - 1) == ')') {
             Expression E = parE(str.substring(1, str.length() - 1));
             if (E != null) {
@@ -114,10 +113,12 @@ public class SimpleExpressionParser implements ExpressionParser {
     }
 
     private List<Expression> parL(String str) {
-        if (str.length() == 1 && (Character.isLetter(str.charAt(0)) || Character.isDigit(str.charAt(0)))) {
-            return makeLiteralExpression(str);
+        for(int i = 0; i < str.length(); i++){
+            if (!(Character.isLetter(str.charAt(i)) || Character.isDigit(str.charAt(i)))) {
+                return null;
+            }
         }
-        return null;
+        return makeLiteralExpression(str);
     }
 
     private ArrayList parseHelper(String str, char op, Function<String, List<Expression>> f1, Function<String, List<Expression>> f2) {

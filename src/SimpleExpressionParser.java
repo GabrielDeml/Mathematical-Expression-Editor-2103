@@ -200,13 +200,13 @@ public class SimpleExpressionParser implements ExpressionParser {
 
     private List<Expression> parseGenericOperation(String exp, char operation) {
         // Find index of the operation (if it is in the string)
-        final int index = exp.indexOf(operation);
-        if (index == -1) return null;
-        final Expression exp1 = parseExpressionNewCFG(exp.substring(0, index)),
-                exp2 = parseExpressionNewCFG(exp.substring(index + 1));
-        // If both sides of the operation are valid expressions, return them as a list
-        if (exp1 != null && exp2 != null) return Arrays.asList(exp1, exp2);
-        // Else (one or more sides was not a valid expression), return null
+        for (int index = exp.indexOf(operation); index != -1; index = exp.indexOf(operation, index + 1)) {
+            final Expression exp1 = parseExpressionNewCFG(exp.substring(0, index)),
+                    exp2 = parseExpressionNewCFG(exp.substring(index + 1));
+            // If both sides of the operation are valid expressions, return them as a list
+            if (exp1 != null && exp2 != null) return Arrays.asList(exp1, exp2);
+            // Else (one or more sides was not a valid expression), try again until no more operations in exp
+        }
         return null;
     }
 
@@ -220,5 +220,10 @@ public class SimpleExpressionParser implements ExpressionParser {
         List<Expression> children = parseGenericOperation(exp, '*');
         if (children == null) return null;
         return new MultiplicativeExpression(children);
+    }
+
+    public static void main(String[] args) throws ExpressionParseException {
+        final String expressionStr = "(x+(x)+(x+x)+x)";
+        new SimpleExpressionParser().parse(expressionStr, false);
     }
 }

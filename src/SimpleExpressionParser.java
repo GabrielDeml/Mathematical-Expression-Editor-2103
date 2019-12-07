@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -72,8 +71,7 @@ public class SimpleExpressionParser implements ExpressionParser {
     private List<Expression> parA(String str) {
         ArrayList<Expression> node = parseHelper(str, '+', this::parA, this::parM);
         if (node != null && node.get(0) != null) {
-//            return new ArrayList<>(Arrays.asList(new AdditiveExpression(new ArrayList<>(Collections.singletonList(node.get(0)))),
-//                    new MultiplicativeExpression(new ArrayList<>(Collections.singletonList(node.get(1))))));
+            //TODO Get rid tmp after it works
             Expression tmp1 = node.get(0);
             Expression tmp2 = node.get(1);
             return makeAdditiveExpression(new ArrayList<Expression>(Arrays.asList(tmp1, tmp2)));
@@ -88,8 +86,7 @@ public class SimpleExpressionParser implements ExpressionParser {
     private List<Expression> parM(String str) {
         List<Expression> node = parseHelper(str, '*', this::parM, this::parM);
         if (node != null && node.get(0) != null) {
-//            return new ArrayList<Expression>(makeMultiplicativeExpression(new ArrayList<Expression>(Arrays.asList(node.get(0)))),
-//                    makeMultiplicativeExpression(new ArrayList<Expression>(Arrays.asList(node.get(1)))));
+            //TODO Get rid tmp after it works
             Expression tmp1 = node.get(0);
             Expression tmp2 = node.get(1);
              return makeMultiplicativeExpression(new ArrayList<Expression>(Arrays.asList(tmp1, tmp2)));
@@ -106,19 +103,19 @@ public class SimpleExpressionParser implements ExpressionParser {
         if ( str.length() > 2 && str.charAt(0) == '(' && str.charAt(str.length() - 1) == ')') {
             Expression E = parE(str.substring(1, str.length() - 1));
             if (E != null) {
-                return new ArrayList<Expression>(Arrays.asList(new ParentheticalExpression(E)));
+                return makeParentheticalExpression(E);
             }
         }
         List<Expression> L = parL(str);
         if (L != null && L.get(0) != null) {
-            return new ArrayList<Expression>(Arrays.asList(new ParentheticalExpression(L.get(0))));
+            return makeParentheticalExpression(L.get(0));
         }
         return null;
     }
 
     private List<Expression> parL(String str) {
         if (str.length() == 1 && (Character.isLetter(str.charAt(0)) || Character.isDigit(str.charAt(0)))) {
-            return new ArrayList<Expression>(Arrays.asList(new LiteralExpression(str)));
+            return makeLiteralExpression(str);
         }
         return null;
     }
@@ -135,6 +132,10 @@ public class SimpleExpressionParser implements ExpressionParser {
         return null;
     }
 
+    private List<Expression>makeLiteralExpression(String value){
+        return new ArrayList<Expression>(Arrays.asList( new LiteralExpression(value)));
+    }
+
     private List<Expression>makeAdditiveExpression(List<Expression> children){
         return new ArrayList<Expression>(Arrays.asList( new AdditiveExpression(children)));
     }
@@ -146,5 +147,6 @@ public class SimpleExpressionParser implements ExpressionParser {
     private List<Expression>makeParentheticalExpression(Expression child){
         return new ArrayList<Expression>(Arrays.asList( new ParentheticalExpression(child)));
     }
+
 
 }

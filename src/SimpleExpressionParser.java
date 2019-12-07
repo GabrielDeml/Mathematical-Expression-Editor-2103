@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -82,7 +81,7 @@ public class SimpleExpressionParser implements ExpressionParser {
     private List<Expression> parM(String str) {
         List<Expression> node = parseHelper(str, '*', this::parM, this::parM);
         if (node != null && node.get(0) != null) {
-             return makeMultiplicativeExpression(node);
+            return makeMultiplicativeExpression(node);
         }
         List<Expression> X = parX(str);
         if (X != null && X.get(0) != null) {
@@ -168,7 +167,7 @@ public class SimpleExpressionParser implements ExpressionParser {
                 will change whether order of operations is followed.
 
         We can experiment with different orders of parse_() calls to get order of operations
-           to be correct (if it isn't already)
+           to be correct (if it isn't already, which I think it is)
          */
 
         // See if it is a literal expression
@@ -186,15 +185,17 @@ public class SimpleExpressionParser implements ExpressionParser {
 
     private Expression parseP(String exp) {
         // If exp is bounded by parens, return a ParentheticalExpression, null otherwise
-        if (exp.length() >= 2 && exp.charAt(0) == '(' && exp.charAt(exp.length() -1) == ')') {
-            return new ParentheticalExpression(parseExpressionNewCFG(exp.substring(1, exp.length() - 1)));
+        if (Pattern.compile("\\(.*\\)").matcher(exp).matches()) {
+            // Check to see if what is inside the parens is an expression or not
+            final Expression insides = parseExpressionNewCFG(exp.substring(1, exp.length() - 1));
+            if (insides != null) return new ParentheticalExpression(insides);
         }
         return null;
     }
 
     private Expression parseL(String exp) {
         // Return a literal expression if exp is matches the necessary regex, null otherwise
-        return (Pattern.compile("[a-z]|(-?[0-9]+)").matcher(exp).matches()) ? new LiteralExpression(exp) : null;
+        return (Pattern.compile("[a-z]|(-?\\d+)").matcher(exp).matches()) ? new LiteralExpression(exp) : null;
     }
 
     private List<Expression> parseGenericOperation(String exp, char operation) {
@@ -221,5 +222,4 @@ public class SimpleExpressionParser implements ExpressionParser {
         if (children == null) return null;
         return new MultiplicativeExpression(children);
     }
-
 }

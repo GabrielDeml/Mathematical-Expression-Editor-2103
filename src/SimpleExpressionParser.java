@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -43,8 +44,6 @@ public class SimpleExpressionParser implements ExpressionParser {
      */
     protected Expression parseExpression(String str) {
         Expression expression;
-
-        System.out.println();
         /**
          * Grammar:
          * E → A | X
@@ -57,24 +56,21 @@ public class SimpleExpressionParser implements ExpressionParser {
     }
 
     private Expression parE(String str) {
-        // Try first production rule (E → A)
-        final List<Expression> A = parA(str);
-        if (A != null) return new AdditiveExpression(A);
-        // Try second production rule (E → X)
-        final List<Expression> X = parX(str);
-        // todo this does not look right...
-        if (X != null) return new ParentheticalExpression(X.get(0));
-        // Doesn't match CFG:
+        List<Expression> A = parA(str);
+        if (A != null) {
+            return A.get(0);
+        }
+        List<Expression> X = parX(str);
+        if (X != null) {
+            return X.get(0);
+        }
         return null;
     }
 
     private List<Expression> parA(String str) {
-        ArrayList<Expression> node = parseHelper(str, '+', this::parA, this::parM);
+        List<Expression> node = parseHelper(str, '+', this::parA, this::parM);
         if (node != null && node.get(0) != null) {
-            //TODO Get rid tmp after it works
-            Expression tmp1 = node.get(0);
-            Expression tmp2 = node.get(1);
-            return makeAdditiveExpression(new ArrayList<Expression>(Arrays.asList(tmp1, tmp2)));
+            return makeAdditiveExpression(new ArrayList<Expression>(Arrays.asList(node.get(0), node.get(1))));
         }
         List<Expression> M = parM(str);
         if (M != null && M.get(0) != null) {
@@ -86,10 +82,7 @@ public class SimpleExpressionParser implements ExpressionParser {
     private List<Expression> parM(String str) {
         List<Expression> node = parseHelper(str, '*', this::parM, this::parM);
         if (node != null && node.get(0) != null) {
-            //TODO Get rid tmp after it works
-            Expression tmp1 = node.get(0);
-            Expression tmp2 = node.get(1);
-            return makeMultiplicativeExpression(new ArrayList<Expression>(Arrays.asList(tmp1, tmp2)));
+             return makeMultiplicativeExpression(node);
         }
         List<Expression> X = parX(str);
         if (X != null && X.get(0) != null) {
@@ -107,7 +100,7 @@ public class SimpleExpressionParser implements ExpressionParser {
         }
         List<Expression> L = parL(str);
         if (L != null && L.get(0) != null) {
-            return makeParentheticalExpression(L.get(0));
+            return L;
         }
         return null;
     }
@@ -121,13 +114,12 @@ public class SimpleExpressionParser implements ExpressionParser {
         return makeLiteralExpression(str);
     }
 
-    private ArrayList parseHelper(String str, char op, Function<String, List<Expression>> f1, Function<String, List<Expression>> f2) {
+    private List<Expression> parseHelper(String str, char op, Function<String, List<Expression>> f1, Function<String, List<Expression>> f2) {
         for (int i = 1; i < str.length() - 1; i++) {
             List<Expression> f1Node = f1.apply(str.substring(0, i));
             List<Expression> f2Node = f2.apply(str.substring(i + 1));
             if (str.charAt(i) == op && f1Node != null && f2Node != null && f1Node.get(0) != null && f2Node.get(0) != null) {
-                return new ArrayList(Arrays.asList(f1Node, f2Node));
-
+                return new ArrayList<Expression>(Arrays.asList(f1Node.get(0), f2Node.get(0)));
             }
         }
         return null;

@@ -41,6 +41,19 @@ public class SimpleExpressionParser implements ExpressionParser {
     }
 
     /**
+     * This is to test the boolean tester
+     *
+     * @param str the string to parse into an expression tree
+     * @throws ExpressionParseException
+     */
+    public boolean parseBoolean(String str) {
+        // Remove spaces -- this simplifies the parsing logic
+        str = str.replaceAll(" ", "");
+        boolean expression = parseExpressionBoolean(str);
+        return expression;
+    }
+
+    /**
      * Attempts to parse the specified string into an Expression
      *
      * @param str the string to attempt to parse
@@ -49,6 +62,7 @@ public class SimpleExpressionParser implements ExpressionParser {
     protected Expression parseExpression(String str) {
         Expression expression;
         parE(str);
+        System.out.println();
         /**
          * Grammar:
          * E → A | X
@@ -58,6 +72,25 @@ public class SimpleExpressionParser implements ExpressionParser {
          * L → [a-z] | [0-9]+
          */
         return null;
+    }
+
+    /**
+     * This is just here to test the boolean parser
+     *
+     * @param str
+     * @return
+     */
+    protected boolean parseExpressionBoolean(String str) {
+        Expression expression;
+        return parE(str);
+        /**
+         * Grammar:
+         * E → A | X
+         * A → A+M | M
+         * M → M*M | X
+         * X → (E) | L
+         * L → [a-z] | [0-9]+
+         */
     }
 
     private boolean parE(String str) {
@@ -82,17 +115,14 @@ public class SimpleExpressionParser implements ExpressionParser {
     }
 
     private boolean parX(String str) {
-        //noinspection ConstantConditions
-        if (str.charAt(0) == '(' &&
-                str.charAt(str.length()) == ')' &&
-                parE(str.substring(1, str.length() - 1))) {
+        if (str.charAt(0) == '(' && str.charAt(str.length() - 1) == ')' && parE(str.substring(1, str.length() - 1))) {
             return true;
         }
         return parL(str);
     }
 
-    private boolean parL(String str){
-        return Character.isLetter(str.charAt(0)) || Character.isDigit(str.charAt(0));
+    private boolean parL(String str) {
+        return str.length() == 1 && (Character.isLetter(str.charAt(0)) || Character.isDigit(str.charAt(0)));
     }
 
     private boolean parseHelper(String str, char op, Function<String, Boolean> f1, Function<String, Boolean> f2) {
@@ -103,5 +133,4 @@ public class SimpleExpressionParser implements ExpressionParser {
         }
         return false;
     }
-
 }

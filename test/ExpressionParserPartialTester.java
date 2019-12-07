@@ -1,8 +1,8 @@
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import java.util.*;
-import java.io.*;
+
+import java.io.IOException;
 
 /**
  * Code to test Project 5; you should definitely add more tests!

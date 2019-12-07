@@ -24,7 +24,7 @@ public class SimpleExpressionParser implements ExpressionParser {
     public Expression parse(String str, boolean withJavaFXControls) throws ExpressionParseException {
         // Remove spaces -- this simplifies the parsing logic
         str = str.replaceAll(" ", "");
-        Expression expression = parseExpression(str);
+        Expression expression = parseExpressionNewCFG(str);
         if (expression == null) {
             // If we couldn't parse the string, then raise an error
             throw new ExpressionParseException("Cannot parse expression: " + str);
@@ -194,18 +194,17 @@ public class SimpleExpressionParser implements ExpressionParser {
     }
 
     private Expression parseL(String exp) {
-        // Return a literal expression if exp is matches the necessary regex, null otherwise
+        // Return a literal expression if exp matches the necessary regex, null otherwise
         return (Pattern.compile("[a-z]|(-?\\d+)").matcher(exp).matches()) ? new LiteralExpression(exp) : null;
     }
 
     private List<Expression> parseGenericOperation(String exp, char operation) {
         // Find index of the operation (if it is in the string)
         final int index = exp.indexOf(operation);
-        // If operation isn't in string or string ends in operation, quit
-        if (index < 0 || index >= exp.length() - 1) return null;
+        if (index == -1) return null;
         final Expression exp1 = parseExpressionNewCFG(exp.substring(0, index)),
                 exp2 = parseExpressionNewCFG(exp.substring(index + 1));
-        // If both sides are valid expressions, return them as a list
+        // If both sides of the operation are valid expressions, return them as a list
         if (exp1 != null && exp2 != null) return Arrays.asList(exp1, exp2);
         // Else (one or more sides was not a valid expression), return null
         return null;

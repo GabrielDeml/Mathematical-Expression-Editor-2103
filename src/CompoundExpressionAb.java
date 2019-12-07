@@ -1,11 +1,12 @@
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class CompoundExpressionAb extends ExpressionAb implements CompoundExpression {
     /**
-     * Children expressions
+     * Children expressions (ArrayList for remove support)
      */
-    private List<Expression> children;
+    private ArrayList<Expression> children;
 
     /**
      * Constructor for a CompoundExpression
@@ -39,7 +40,7 @@ public abstract class CompoundExpressionAb extends ExpressionAb implements Compo
      */
     public void setChildren(List<Expression> children) {
         children.forEach(child -> child.setParent(this));
-        this.children = children;
+        this.children = new ArrayList<>(children);
     }
 
     /**

@@ -56,6 +56,15 @@ public class ExpressionParserPartialTester {
 		final String parseTreeStr = "*\n\t4\n\t()\n\t\t+\n\t\t\tz\n\t\t\t*\n\t\t\t\t5\n\t\t\t\tx\n";
 		assertEquals(parseTreeStr, _parser.parse(expressionStr, false).convertToString(0));
 	}
+	@Test
+	/**
+	 * Verifies that a specific expression is parsed into the correct parse tree.
+	 */
+	public void testExpression4 () throws ExpressionParseException {
+		final String expressionStr = "(x)*5*(64)+(+5+2+23)*2+2+8s";
+		final String parseTreeStr = "+\n\t*\n";
+		assertEquals(parseTreeStr, _parser.parse(expressionStr, false).convertToString(0));
+	}
 
 	@Test
 	/**
@@ -77,7 +86,7 @@ public class ExpressionParserPartialTester {
 		assertEquals(parseTreeStr, _parser.parse(expressionStr, false).convertToString(0));
 	}
 
-	@Test(expected = ExpressionParseException.class) 
+	@Test(expected = ExpressionParseException.class)
 	/**
 	 * Verifies that a specific expression is parsed into the correct parse tree.
 	 */
@@ -86,7 +95,7 @@ public class ExpressionParserPartialTester {
 		_parser.parse(expressionStr, false);
 	}
 
-	@Test(expected = ExpressionParseException.class) 
+	@Test(expected = ExpressionParseException.class)
 	/**
 	 * Verifies that a specific expression is parsed into the correct parse tree.
 	 */
@@ -95,7 +104,7 @@ public class ExpressionParserPartialTester {
 		_parser.parse(expressionStr, false);
 	}
 
-	@Test(expected = ExpressionParseException.class) 
+	@Test(expected = ExpressionParseException.class)
 	/**
 	 * Verifies that a specific expression is parsed into the correct parse tree.
 	 */
@@ -103,4 +112,5 @@ public class ExpressionParserPartialTester {
 		final String expressionStr = "()()";
 		_parser.parse(expressionStr, false);
 	}
+
 }

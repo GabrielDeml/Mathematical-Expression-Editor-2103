@@ -43,7 +43,6 @@ public class SimpleExpressionParser implements ExpressionParser {
      * @return null if could not parse str, the associated Expression otherwise
      */
     protected Expression parseExpression(String str) {
-        Expression expression;
         /**
          * Grammar:
          * E → A | X
@@ -55,34 +54,63 @@ public class SimpleExpressionParser implements ExpressionParser {
         return parE(str);
     }
 
+    /**
+     * Implements the E grammar
+     *
+     * @param str this is the string we are parsing
+     * @return an expression
+     */
     private Expression parE(String str) {
+        // Try to parse using A
         List<Expression> A = parA(str);
+        // If it works return it
         if (A != null) {
             return A.get(0);
         }
+        // Try parsing using X
         List<Expression> X = parX(str);
+        // If it works return it
         if (X != null) {
             return X.get(0);
         }
         return null;
     }
 
+    /**
+     * Implements the A grammar
+     *
+     * @param str this is the string we are parsing
+     * @return an expression
+     */
     private List<Expression> parA(String str) {
+        //Try parsing using the A+M part of the A grammar
         List<Expression> node = parseHelper(str, '+', this::parA, this::parM);
+        //If parsing using the A+M works then make a new node an return it
         if (node != null && node.get(0) != null) {
             return makeAdditiveExpression(new ArrayList<Expression>(Arrays.asList(node.get(0), node.get(1))));
         }
+        // If the A+M part does not work try using the M part
         List<Expression> M = parM(str);
+        // If it works return it
         if (M != null && M.get(0) != null) {
             return M;
         }
+        //Only return null if nothing else works
         return null;
     }
 
+    /**
+     * Implements the M grammar
+     *
+     * @param str this is the string we are parsing
+     * @return an expression
+     */
     private List<Expression> parM(String str) {
+        //Try parsing using the M+M part of the M grammar
         List<Expression> node = parseHelper(str, '*', this::parM, this::parM);
+
         if (node != null && node.get(0) != null) {
-             return makeMultiplicativeExpression(node);
+            return makeMultiplicativeExpression(node);
         }
         List<Expression> X = parX(str);
         if (X != null && X.get(0) != null) {
@@ -92,7 +120,7 @@ public class SimpleExpressionParser implements ExpressionParser {
     }
 
     private List<Expression> parX(String str) {
-        if ( str.length() > 2 && str.charAt(0) == '(' && str.charAt(str.length() - 1) == ')') {
+        if (str.length() > 2 && str.charAt(0) == '(' && str.charAt(str.length() - 1) == ')') {
             Expression E = parE(str.substring(1, str.length() - 1));
             if (E != null) {
                 return makeParentheticalExpression(E);
@@ -106,7 +134,7 @@ public class SimpleExpressionParser implements ExpressionParser {
     }
 
     private List<Expression> parL(String str) {
-        for(int i = 0; i < str.length(); i++){
+        for (int i = 0; i < str.length(); i++) {
             if (!(Character.isLetter(str.charAt(i)) || Character.isDigit(str.charAt(i)))) {
                 return null;
             }
@@ -125,20 +153,20 @@ public class SimpleExpressionParser implements ExpressionParser {
         return null;
     }
 
-    private List<Expression>makeLiteralExpression(String value){
-        return new ArrayList<Expression>(Arrays.asList( new LiteralExpression(value)));
+    private List<Expression> makeLiteralExpression(String value) {
+        return new ArrayList<Expression>(Arrays.asList(new LiteralExpression(value)));
     }
 
-    private List<Expression>makeAdditiveExpression(List<Expression> children){
-        return new ArrayList<Expression>(Arrays.asList( new AdditiveExpression(children)));
+    private List<Expression> makeAdditiveExpression(List<Expression> children) {
+        return new ArrayList<Expression>(Arrays.asList(new AdditiveExpression(children)));
     }
 
-    private List<Expression>makeMultiplicativeExpression(List<Expression> children){
-        return new ArrayList<Expression>(Arrays.asList( new MultiplicativeExpression(children)));
+    private List<Expression> makeMultiplicativeExpression(List<Expression> children) {
+        return new ArrayList<Expression>(Arrays.asList(new MultiplicativeExpression(children)));
     }
 
-    private List<Expression>makeParentheticalExpression(Expression child){
-        return new ArrayList<Expression>(Arrays.asList( new ParentheticalExpression(child)));
+    private List<Expression> makeParentheticalExpression(Expression child) {
+        return new ArrayList<Expression>(Arrays.asList(new ParentheticalExpression(child)));
     }
 
 

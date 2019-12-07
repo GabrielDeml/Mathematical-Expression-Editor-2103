@@ -10,10 +10,9 @@ public abstract class CompoundExpressionAb extends ExpressionAb implements Compo
     /**
      * Constructor for a CompoundExpression
      *
-     * @param parent the parent of this Expression
+     * @param children the children of this Expression
      */
-    public CompoundExpressionAb(CompoundExpression parent, List<Expression> children) {
-        setParent(parent);
+    public CompoundExpressionAb(List<Expression> children) {
         setChildren(children);
     }
 

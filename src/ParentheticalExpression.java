@@ -4,11 +4,10 @@ import java.util.List;
 public class ParentheticalExpression extends CompoundExpressionAb {
     /**
      * Constructs a ParentheticalExpression
-     * @param parent this ParentheticalExpression's parent
      * @param child the child of this ParentheticalExpression
      */
-    public ParentheticalExpression(CompoundExpression parent, Expression child) {
-        super(parent, Collections.singletonList(child));
+    public ParentheticalExpression(Expression child) {
+        super(Collections.singletonList(child));
     }
 
     /**
@@ -50,6 +49,6 @@ public class ParentheticalExpression extends CompoundExpressionAb {
      */
     @Override
     public Expression deepCopy() {
-        return new ParentheticalExpression(null, deepCopyChildren().get(0));
+        return new ParentheticalExpression(deepCopyChildren().get(0));
     }
 }

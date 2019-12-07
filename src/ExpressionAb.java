@@ -2,7 +2,7 @@ abstract class ExpressionAb implements Expression {
     /**
      * Parent expression
      */
-    private CompoundExpression parent;
+    private CompoundExpression parent = null;
 
     /**
      * Returns the expression's parent.

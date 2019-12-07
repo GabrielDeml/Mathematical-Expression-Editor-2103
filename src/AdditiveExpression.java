@@ -4,11 +4,10 @@ public class AdditiveExpression extends CompoundExpressionAb {
     /**
      * Constructor for a CompoundExpression
      *
-     * @param parent   the parent of this Expression
      * @param children the children of this Expression
      */
-    public AdditiveExpression(CompoundExpression parent, List<Expression> children) {
-        super(parent, children);
+    public AdditiveExpression(List<Expression> children) {
+        super(children);
     }
 
     /**
@@ -49,6 +48,6 @@ public class AdditiveExpression extends CompoundExpressionAb {
      */
     @Override
     public Expression deepCopy() {
-        return new AdditiveExpression(null, deepCopyChildren());
+        return new AdditiveExpression(deepCopyChildren());
     }
 }

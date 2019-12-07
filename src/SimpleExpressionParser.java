@@ -61,7 +61,7 @@ public class SimpleExpressionParser implements ExpressionParser {
      */
     protected Expression parseExpression(String str) {
         Expression expression;
-        parE(str);
+
         System.out.println();
         /**
          * Grammar:
@@ -71,7 +71,7 @@ public class SimpleExpressionParser implements ExpressionParser {
          * X → (E) | L
          * L → [a-z] | [0-9]+
          */
-        return null;
+        return parE(str);
     }
 
     /**
@@ -80,57 +80,83 @@ public class SimpleExpressionParser implements ExpressionParser {
      * @param str
      * @return
      */
-    protected boolean parseExpressionBoolean(String str) {
-        Expression expression;
-        return parE(str);
-        /**
-         * Grammar:
-         * E → A | X
-         * A → A+M | M
-         * M → M*M | X
-         * X → (E) | L
-         * L → [a-z] | [0-9]+
-         */
-    }
-
-    private boolean parE(String str) {
-        if (parA(str)) {
-            return true;
+//    protected boolean parseExpressionBoolean(String str) {
+//        Expression expression;
+//        return parE(str);
+//        /**
+//         * Grammar:
+//         * E → A | X
+//         * A → A+M | M
+//         * M → M*M | X
+//         * X → (E) | L
+//         * L → [a-z] | [0-9]+
+//         */
+//    }
+    private Expression parE(String str) throws ExpressionParseException {
+        Expression A = new AdditiveExpression(parA(str));
+        if (A != null) {
+            return A;
         }
-        return parX(str);
-    }
-
-    private boolean parA(String str) {
-        if (parseHelper(str, '+', this::parA, this::parM)) {
-            return true;
+        Expression X = new ParentheticalExpression(parX(str));
+        if (X != null) {
+            return X;
         }
-        return parM(str);
+        throw new ExpressionParseException("Isn't a valid string");
     }
 
-    private boolean parM(String str) {
-        if (parseHelper(str, '*', this::parM, this::parM)) {
-            return true;
+    private List<Expression> parA(String str) {
+        List<Expression> node = parseHelper(str, '+', this::parA, this::parM);
+        if (node.get(0) != null) {
+            return new ArrayList<>(Arrays.asList(new AdditiveExpression(new ArrayList<Expression>(Arrays.asList(node.get(0)))),
+                    new MultiplicativeExpression(new ArrayList<Expression>(Arrays.asList(node.get(1))))));
         }
-        return parX(str);
-    }
-
-    private boolean parX(String str) {
-        if (str.charAt(0) == '(' && str.charAt(str.length() - 1) == ')' && parE(str.substring(1, str.length() - 1))) {
-            return true;
+        List<Expression> M = parM(str);
+        if (M.get(0) != null) {
+            return M;
         }
-        return parL(str);
+        return null;
     }
 
-    private boolean parL(String str) {
-        return str.length() == 1 && (Character.isLetter(str.charAt(0)) || Character.isDigit(str.charAt(0)));
+    private List<Expression> parM(String str) {
+        List<Expression> node = parseHelper(str, '*', this::parM, this::parM);
+        if (node.get(0) != null) {
+            return new ArrayList<>(Arrays.asList(new MultiplicativeExpression(new ArrayList<Expression>(Arrays.asList(node.get(0)))),
+                    new MultiplicativeExpression(new ArrayList<Expression>(Arrays.asList(node.get(1))))));
+        }
+        List<Expression> X = parX(str);
+        if (X.get(0) != null) {
+            return X;
+        }
+        return null;
     }
 
-    private boolean parseHelper(String str, char op, Function<String, Boolean> f1, Function<String, Boolean> f2) {
-        for (int i = 1; i < str.length() - 1; i++) {
-            if (str.charAt(i) == op && f1.apply(str.substring(0, i)) && f2.apply(str.substring(i + 1))) {
-                return true;
+    private List<Expression> parX(String str){
+
+        if (str.charAt(0) == '(' && str.charAt(str.length() - 1) == ')') {
+            Expression E = parE(str.substring(1, str.length() - 1));
+            if (E != null) {
+                return new ArrayList<Expression>(Arrays.asList(new ParentheticalExpression(E)));
             }
         }
-        return false;
+        return null;
+    }
+
+    private List<Expression> parL(String str) {
+        if(str.length() == 1 && (Character.isLetter(str.charAt(0)) || Character.isDigit(str.charAt(0)))){
+            return new ArrayList<Expression>(Arrays.asList(new LiteralExpression(str)));
+        }
+        return null;
+    }
+
+    private List<Expression> parseHelper(String str, char op, Function<String, List<Expression>> f1, Function<String, List<Expression>> f2) {
+        for (int i = 1; i < str.length() - 1; i++) {
+            List<Expression> f1Node = f1.apply(str.substring(0, i));
+            List<Expression> f2Node = f2.apply(str.substring(i + 1));
+            if (str.charAt(i) == op && f1Node.get(0) != null && f2Node.get(0) != null) {
+                return new ArrayList(Arrays.asList(f1Node, f2Node));
+
+            }
+        }
+        return null;
     }
 }

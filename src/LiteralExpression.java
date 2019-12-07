@@ -6,11 +6,9 @@ public class LiteralExpression extends ExpressionAb {
 
     /**
      * Constructs a LiteralExpression with the given parent and value
-     * @param parent the parent of this LiteralExpression
      * @param value the value of this LiteralExpression
      */
-    public LiteralExpression(CompoundExpression parent, String value) {
-        setParent(parent);
+    public LiteralExpression(String value) {
         this.value = value;
     }
 
@@ -34,7 +32,7 @@ public class LiteralExpression extends ExpressionAb {
      */
     @Override
     public Expression deepCopy() {
-        return new LiteralExpression(null, value);
+        return new LiteralExpression(value);
     }
 
     /**

@@ -42,8 +42,7 @@ public class SimpleExpressionParser implements ExpressionParser {
      * @return null if could not parse str, the associated Expression otherwise
      */
     protected Expression parseExpression(String str) {
-        Expression expression;
-        /**
+        /*
          * Grammar:
          * E → A | X
          * A → A+M | M

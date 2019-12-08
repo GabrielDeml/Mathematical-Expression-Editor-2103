@@ -62,7 +62,7 @@ public class SimpleExpressionParser implements ExpressionParser {
     /**
      * Implement of P grammar
      *
-     * @param exp String to parse
+     * @param exp the string to parse
      * @return Expression if exp is parsable or null if it is not
      */
     private Expression parseP(String exp) {
@@ -78,7 +78,7 @@ public class SimpleExpressionParser implements ExpressionParser {
     /**
      * Implement of L grammar
      *
-     * @param exp String to parse
+     * @param exp the string to parse
      * @return Expression if exp is parsable or null if it is not
      */
     private Expression parseL(String exp) {
@@ -87,11 +87,12 @@ public class SimpleExpressionParser implements ExpressionParser {
     }
 
     /**
-     * Parse a generic operation
+     * Parse a generic math operation (like addition or multiplication)
+     * This method could be easily used with subtraction and division too
      *
-     * @param exp       String to parse
-     * @param operation Symbol to parse (+,*,-)
-     * @return Expression if exp is parsable or null if it is not
+     * @param exp       the string to parse
+     * @param operation the operation to parse with (+ or *, but could also work with - and /)
+     * @return a list of children expressions or null if it is not parsable
      */
     private List<Expression> parseGenericOperation(String exp, char operation) {
         // Find index of the operation (if it is in the string)
@@ -110,13 +111,13 @@ public class SimpleExpressionParser implements ExpressionParser {
     /**
      * Implement of A grammar
      *
-     * @param exp String to parse
+     * @param exp the string to parse
      * @return Expression if exp is parsable or null if it is not
      */
     private Expression parseA(String exp) {
         // Parse using parseGenericOperation
         List<Expression> children = parseGenericOperation(exp, '+');
-        // If parseGenericOperation didn't find anything return null else make a new node else
+        // If parseGenericOperation didn't find anything return null else make a new node
         if (children == null) return null;
         return new AdditiveExpression(children);
     }
@@ -124,13 +125,13 @@ public class SimpleExpressionParser implements ExpressionParser {
     /**
      * Implement of M grammar
      *
-     * @param exp String to parse
+     * @param exp the string to parse
      * @return Expression if exp is parsable or null if it is not
      */
     private Expression parseM(String exp) {
         // Parse using parseGenericOperation
         List<Expression> children = parseGenericOperation(exp, '*');
-        // If parseGenericOperation didn't find anything return null else make a new node else
+        // If parseGenericOperation didn't find anything return null else make a new node
         if (children == null) return null;
         return new MultiplicativeExpression(children);
     }

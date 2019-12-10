@@ -1,3 +1,5 @@
+import javafx.scene.Node;
+
 import java.util.List;
 
 public class AdditiveExpression extends CompoundExpressionAb {
@@ -49,5 +51,10 @@ public class AdditiveExpression extends CompoundExpressionAb {
     @Override
     public Expression deepCopy() {
         return new AdditiveExpression(deepCopyChildren());
+    }
+
+    @Override
+    public Node getNode(){
+        return  treeToText(this);
     }
 }

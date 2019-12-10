@@ -1,3 +1,5 @@
+import javafx.scene.Node;
+
 public class LiteralExpression extends ExpressionAb {
     /**
      * The value of this LiteralExpression
@@ -44,5 +46,10 @@ public class LiteralExpression extends ExpressionAb {
      */
     @Override
     public void flatten() {
+    }
+
+    @Override
+    public Node getNode(){
+        return  treeToText(this);
     }
 }

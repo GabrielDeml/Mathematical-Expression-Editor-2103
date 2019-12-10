@@ -1,4 +1,15 @@
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
+
+import java.util.List;
+
 abstract class ExpressionAb implements Expression {
+    /**
+     * Make it so we can call ourselves
+     */
+    CompoundExpressionAb us = null;
     /**
      * Parent expression
      */
@@ -54,5 +65,25 @@ abstract class ExpressionAb implements Expression {
      */
     public String convertToString() {
         return convertToString(0);
+    }
+
+    Node treeToText(Expression parent) {
+        StringBuilder tmp = new StringBuilder();
+        CompoundExpressionAb parentCompound;
+        HBox tmpHbox = new HBox();
+        if (parent instanceof LiteralExpression) {
+            LiteralExpression literalParent = (LiteralExpression) parent;
+            tmpHbox.getChildren().setAll(new Text(literalParent.getValue()));
+        }
+        parentCompound = (CompoundExpressionAb) parent;
+        for (Expression expression : parentCompound.getChildren()) {
+            if (expression instanceof AdditiveExpression) {
+                tmpHbox.getChildren().setAll(new Text(treeToText(expression) + "+"));
+            }
+            if (expression instanceof MultiplicativeExpression) {
+                tmpHbox.getChildren().setAll(new Text(treeToText(expression) + "*"));
+            }
+        }
+        return tmpHbox;
     }
 }

@@ -1,3 +1,5 @@
+import javafx.scene.Node;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -50,5 +52,10 @@ public class ParentheticalExpression extends CompoundExpressionAb {
     @Override
     public Expression deepCopy() {
         return new ParentheticalExpression(deepCopyChildren().get(0));
+    }
+
+    @Override
+    public Node getNode(){
+        return  treeToText(this);
     }
 }

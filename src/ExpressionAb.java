@@ -1,9 +1,10 @@
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
-import java.util.List;
+import java.util.*;
 
 abstract class ExpressionAb implements Expression {
     /**
@@ -67,23 +68,46 @@ abstract class ExpressionAb implements Expression {
         return convertToString(0);
     }
 
-    Node treeToText(Expression parent) {
-        StringBuilder tmp = new StringBuilder();
-        CompoundExpressionAb parentCompound;
+    HBox treeToText(Expression parent) {
+
         HBox tmpHbox = new HBox();
         if (parent instanceof LiteralExpression) {
             LiteralExpression literalParent = (LiteralExpression) parent;
-            tmpHbox.getChildren().setAll(new Text(literalParent.getValue()));
-        }
-        parentCompound = (CompoundExpressionAb) parent;
-        for (Expression expression : parentCompound.getChildren()) {
-            if (expression instanceof AdditiveExpression) {
-                tmpHbox.getChildren().setAll(new Text(treeToText(expression) + "+"));
+            tmpHbox.getChildren().addAll(new Text(literalParent.getValue()));
+
+        } else {
+            CompoundExpressionAb parentCompound = (CompoundExpressionAb) parent;
+            if (parentCompound instanceof AdditiveExpression) {
+                for (int i = 0; i < parentCompound.getChildren().size(); i++) {
+                    Expression expression1 = parentCompound.getChildren().get(i);
+                    tmpHbox.getChildren().addAll(treeToText(expression1));
+                    if (i < parentCompound.getChildren().size() - 1) {
+                        tmpHbox.getChildren().addAll(new Text("+"));
+                    }
+                }
             }
-            if (expression instanceof MultiplicativeExpression) {
-                tmpHbox.getChildren().setAll(new Text(treeToText(expression) + "*"));
+            if (parentCompound instanceof MultiplicativeExpression) {
+                for (int i = 0; i < parentCompound.getChildren().size(); i++) {
+                    Expression expression1 = parentCompound.getChildren().get(i);
+                    tmpHbox.getChildren().addAll(treeToText(expression1));
+                    if (i < parentCompound.getChildren().size() - 1) {
+                        tmpHbox.getChildren().addAll(new Text("*"));
+                    }
+                }
+            }
+            if (parentCompound instanceof ParentheticalExpression) {
+                HBox tmp = new HBox();
+
+
+                tmpHbox.getChildren().addAll(new Text("("));
+                for (int i = 0; i < parentCompound.getChildren().size(); i++) {
+                    Expression expression1 = parentCompound.getChildren().get(i);
+                    tmpHbox.getChildren().addAll(treeToText(expression1));
+                }
+                tmpHbox.getChildren().addAll(new Text(")"));
             }
         }
+
         return tmpHbox;
     }
 }

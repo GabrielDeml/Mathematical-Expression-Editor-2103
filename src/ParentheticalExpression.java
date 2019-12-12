@@ -1,11 +1,14 @@
 import javafx.scene.Node;
+import javafx.scene.text.Text;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class ParentheticalExpression extends CompoundExpressionAb {
     /**
      * Constructs a ParentheticalExpression
+     *
      * @param child the child of this ParentheticalExpression
      */
     public ParentheticalExpression(Expression child) {
@@ -14,6 +17,7 @@ public class ParentheticalExpression extends CompoundExpressionAb {
 
     /**
      * An override to allow only one child
+     *
      * @param subexpression the child expression to add
      */
     @Override
@@ -23,6 +27,7 @@ public class ParentheticalExpression extends CompoundExpressionAb {
 
     /**
      * An override to allow only one child
+     *
      * @param children the new children of this CompoundExpression
      */
     @Override
@@ -43,6 +48,17 @@ public class ParentheticalExpression extends CompoundExpressionAb {
     }
 
     /**
+     * Adds parentheses around the child Expression's Node to make it displayable
+     *
+     * @param expressionNodes what to place parentheses around
+     * @return a list of nodes ready to be displayed
+     */
+    @Override
+    List<Node> getChildrenNodes(List<Node> expressionNodes) {
+        return Arrays.asList(new Text("("), expressionNodes.get(0), new Text(")"));
+    }
+
+    /**
      * Creates and returns a deep copy of the expression.
      * The entire tree rooted at the target node is copied, i.e.,
      * the copied Expression is as deep as possible.
@@ -52,10 +68,5 @@ public class ParentheticalExpression extends CompoundExpressionAb {
     @Override
     public Expression deepCopy() {
         return new ParentheticalExpression(deepCopyChildren().get(0));
-    }
-
-    @Override
-    public Node getNode(){
-        return  treeToText(this);
     }
 }

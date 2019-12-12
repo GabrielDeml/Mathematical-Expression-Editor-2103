@@ -1,4 +1,6 @@
 import javafx.scene.Node;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
 
 public class LiteralExpression extends ExpressionAb {
     /**
@@ -50,6 +52,6 @@ public class LiteralExpression extends ExpressionAb {
 
     @Override
     public Node getNode(){
-        return  treeToText(this);
+        return new HBox(new Text(this.getValue()));
     }
 }

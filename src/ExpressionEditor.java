@@ -31,11 +31,22 @@ public class ExpressionEditor extends Application {
         MouseEventHandler(Pane pane_, CompoundExpression rootExpression_) {
         }
 
+        double orgSceneX, orgSceneY;
+        double orgTranslateX, orgTranslateY;
         public void handle(MouseEvent event) {
             if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
-                //TODO implement me
+                orgSceneX = event.getSceneX();
+                orgSceneY = event.getSceneY();
+                orgTranslateX = ((Pane) (event.getSource())).getTranslateX();
+                orgTranslateY = ((Pane) (event.getSource())).getTranslateY();
             } else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
-                //TODO implement me
+                double offsetX = event.getSceneX() - orgSceneX;
+                double offsetY = event.getSceneY() - orgSceneY;
+                double newTranslateX = orgTranslateX + offsetX;
+                double newTranslateY = orgTranslateY + offsetY;
+
+                ((Pane) (event.getSource())).setTranslateX(newTranslateX);
+                ((Pane) (event.getSource())).setTranslateY(newTranslateY);
             } else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
                 //TODO implement me
             }

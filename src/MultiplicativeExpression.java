@@ -1,5 +1,3 @@
-import javafx.scene.Node;
-
 import java.util.List;
 
 public class MultiplicativeExpression extends CompoundExpressionAb {
@@ -10,7 +8,6 @@ public class MultiplicativeExpression extends CompoundExpressionAb {
      */
     public MultiplicativeExpression(List<Expression> children) {
         super(children);
-        us = this;
     }
 
     /**
@@ -55,8 +52,4 @@ public class MultiplicativeExpression extends CompoundExpressionAb {
     }
 
 
-    @Override
-    public Node getNode(){
-        return  treeToText(this);
-    }
 }

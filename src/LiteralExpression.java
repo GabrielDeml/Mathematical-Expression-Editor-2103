@@ -13,6 +13,7 @@ public class LiteralExpression extends ExpressionAb {
      * @param value the value of this LiteralExpression
      */
     public LiteralExpression(String value) {
+        super(new Text(value));
         this.value = value;
     }
 
@@ -49,7 +50,6 @@ public class LiteralExpression extends ExpressionAb {
     @Override
     public void flatten() {
     }
-
     @Override
     public Node getNode(){
         return new HBox(new Text(this.getValue()));

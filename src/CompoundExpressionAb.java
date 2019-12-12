@@ -1,4 +1,9 @@
+import javafx.scene.Node;
+import javafx.scene.layout.HBox;
+import javafx.scene.text.Text;
+
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,6 +19,7 @@ public abstract class CompoundExpressionAb extends ExpressionAb implements Compo
      * @param children the children of this Expression
      */
     public CompoundExpressionAb(List<Expression> children) {
+        super(new HBox());
         setChildren(children);
     }
 
@@ -24,8 +30,8 @@ public abstract class CompoundExpressionAb extends ExpressionAb implements Compo
      */
     @Override
     public void addSubexpression(Expression subexpression) {
-        subexpression.setParent(this);
         children.add(subexpression);
+        setChildren(children);
     }
 
     /**
@@ -41,6 +47,37 @@ public abstract class CompoundExpressionAb extends ExpressionAb implements Compo
     public void setChildren(List<Expression> children) {
         children.forEach(child -> child.setParent(this));
         this.children = new ArrayList<>(children);
+        getHBox().getChildren().clear();
+        getHBox().getChildren().addAll(getChildrenNodes(this.children.stream()
+                .map(Expression::getNode).collect(Collectors.toList())));
+    }
+
+    /**
+     * Adds appropriate dividers between the nodes to make the expression displayable
+     * The default implementation will work for any operation (+, -, *, /) but not much else
+     *
+     * @param expressionNodes the children nodes that need to have dividers placed
+     * @return a list of nodes ready to be displayed
+     */
+    List<Node> getChildrenNodes(List<Node> expressionNodes) {
+        return getChildrenNodesFromDivider(expressionNodes, getValue());
+    }
+
+    /**
+     * Helper function for getChildrenNodes that adds a divider between each of the expression nodes
+     *
+     * @param expressionNodes the expression Nodes to add dividers between
+     * @param divider         the string to divide each expression node with
+     * @return ready to display list of nodes
+     */
+    List<Node> getChildrenNodesFromDivider(List<Node> expressionNodes, String divider) {
+        final LinkedList<Node> returnVal = new LinkedList<>();
+        for (Node expression : expressionNodes) {
+            returnVal.add(expression);
+            returnVal.add(new Text(divider));
+        }
+        if (!returnVal.isEmpty()) returnVal.removeLast(); // To remove the last divider added
+        return returnVal;
     }
 
     /**
@@ -78,5 +115,14 @@ public abstract class CompoundExpressionAb extends ExpressionAb implements Compo
     @Override
     public void flatten() {
         getChildren().forEach(Expression::flatten);
+    }
+
+    /**
+     * Convenience cast to get the HBox
+     *
+     * @return this expression's node as an HBox
+     */
+    HBox getHBox() {
+        return (HBox) getNode();
     }
 }

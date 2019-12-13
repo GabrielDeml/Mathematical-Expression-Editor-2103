@@ -60,15 +60,10 @@ public class ExpressionEditor extends Application {
                 // Get the width and height of the hbox
                 double tmpWidth = expression.getNode().getLayoutBounds().getWidth();
                 double tmpHeight = expression.getNode().getLayoutBounds().getHeight();
-
-                Bounds boundsInScene = expression.getNode().localToScene(expression.getNode().getBoundsInLocal());
-//                Bounds tmpLocationX = expression.getNode().getBoundsInParent();
-//                double tmpLocationY = expression.getNode().getLayoutY();
-                // Location of the box in the scene
-                Point2D tmpSceneLocation = expression.getNode().localToScene(boundsInScene.getMinX(), boundsInScene.getMinY());
-                System.out.println("tmpSceneLocation.getX() :" + tmpSceneLocation.getX() + "\n tmpSceneLocation.getY() : " + tmpSceneLocation.getY() + "\n tmpLocationX : " + boundsInScene.getMinX() + "\n tmpLocationY : " + boundsInScene.getMinY() + "\n X : " + X + "\n Y : " + Y);
+                Point2D tmpSceneLocation = expression.getNode().localToScene(expression.getNode().getBoundsInLocal().getMinX(), expression.getNode().getBoundsInLocal().getMinY());
                 // Check if we are in those bounds
                 if (tmpSceneLocation.getX() < X && X < (tmpSceneLocation.getX() + tmpWidth) && tmpSceneLocation.getY() < Y && Y < (tmpSceneLocation.getY() + tmpHeight)) {
+                    System.out.println("We found it");
                     return expression;
                 }
             }
@@ -106,7 +101,7 @@ public class ExpressionEditor extends Application {
                 mouseLocationOnClickX = event.getSceneX();
                 mouseLocationOnClickY = event.getSceneY();
                 Expression tmpExpression = findClickedExpression(mouseLocationOnClickX, mouseLocationOnClickY);
-                System.out.println("We are here");
+//                System.out.println("We are here");
 //                double offsetX = event.getSceneX() - mouseLocationOnClickX;
 //                double offsetY = event.getSceneY() - mouseLocationOnClickY;
 //                double newTranslateX = orgTranslateX + offsetX;

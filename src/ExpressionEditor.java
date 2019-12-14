@@ -31,16 +31,22 @@ public class ExpressionEditor extends Application {
      */
 
     /**
-     * Click or drag flipflop
+     * Expression to drag
      */
+    private Expression expressionToDrag;
 
-    boolean shouldClick = true;
-    Expression expressionWithborder;
+    /**
+     * FlipFlop clicks
+     */
+    private Boolean shouldClick;
+
+    private Expression expressionWithborder;
 
     /**
      * Mouse event handler for the entire pane that constitutes the ExpressionEditor
      */
     private class MouseEventHandler implements EventHandler<MouseEvent> {
+
         /**
          * Finds the clicked expression
          *
@@ -57,9 +63,7 @@ public class ExpressionEditor extends Application {
                 // Get the width and height of the hbox
                 double tmpWidth = expression.getNode().getLayoutBounds().getWidth();
                 double tmpHeight = expression.getNode().getLayoutBounds().getHeight();
-                Point2D tmpSceneLocation = expression.getNode()
-                        .localToScene(expression.getNode().getBoundsInLocal().getMinX(),
-                                expression.getNode().getBoundsInLocal().getMinY());
+                Point2D tmpSceneLocation = getLocationOfExpression(expression);
                 // Check if we are in those bounds
                 if (tmpSceneLocation.getX() < X && X < (tmpSceneLocation.getX() + tmpWidth) &&
                         tmpSceneLocation.getY() < Y && Y < (tmpSceneLocation.getY() + tmpHeight)) {
@@ -82,11 +86,11 @@ public class ExpressionEditor extends Application {
             mouseLocationOnClickY = event.getSceneY();
 
             if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
-                if (shouldClick) shouldClick = false;
-                else {
-                    shouldClick = true;
-                    return;
-                }
+//                if (shouldClick) {
+//                    shouldClick = false;
+//                } else {
+//                    shouldClick = true;
+//                }
                 if (focusExpression == null) {
                     focusExpression = rootExpression;
                 }
@@ -95,25 +99,32 @@ public class ExpressionEditor extends Application {
                     focusExpression = tmpExpression;
                     setBorder(tmpExpression);
                 }
+                expressionToDrag = focusExpression.deepCopy();
+                Point2D tmpSceneLocation = getLocationOfExpression(focusExpression);
+                expressionToDrag.getNode().setLayoutX(tmpSceneLocation.getX());
+                expressionToDrag.getNode().setLayoutY(tmpSceneLocation.getY());
+                pane.getChildren().add(expressionToDrag.getNode());
             } else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
 
                 Expression tmpExpression = findClickedExpression(mouseLocationOnClickX, mouseLocationOnClickY);
-                if (tmpExpression != null) {
-                    focusExpression = tmpExpression;
-                }
-                double offsetX = event.getSceneX() - mouseLocationOnClickX;
-                double offsetY = event.getSceneY() - mouseLocationOnClickY;
-                focusExpression.getNode().setTranslateX(offsetX);
-                focusExpression.getNode().setTranslateY(offsetY);
-//                double newTranslateX = orgTranslateX + offsetX;
-//                double newTranslateY = orgTranslateY + offsetY;
+                Point2D tmpSceneLocation = getLocationOfExpression(focusExpression);
+                double offsetX = event.getSceneX() - tmpSceneLocation.getX();
+                double offsetY = event.getSceneY() - tmpSceneLocation.getY();
 
-//                ((Pane) (event.getSource())).setTranslateX(newTranslateX);
-//                ((Pane) (event.getSource())).setTranslateY(newTranslateY);
+                expressionToDrag.getNode().setTranslateX(offsetX);
+                expressionToDrag.getNode().setTranslateY(offsetY);
             } else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
-                //TODO implement me
+                if(expressionToDrag != null) {
+                    pane.getChildren().remove(expressionToDrag.getNode());
+                }
             }
         }
+    }
+
+    private Point2D getLocationOfExpression(Expression expression) {
+        return expression.getNode()
+                .localToScene(expression.getNode().getBoundsInLocal().getMinX(),
+                        expression.getNode().getBoundsInLocal().getMinY());
     }
 
     /**

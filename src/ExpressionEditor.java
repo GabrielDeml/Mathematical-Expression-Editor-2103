@@ -27,6 +27,17 @@ public class ExpressionEditor extends Application {
     private Pane pane;
 
     /**
+     * Node with border
+     */
+
+    /**
+     * Click or drag flipflop
+     */
+
+    boolean shouldClick = true;
+    Expression expressionWithborder;
+
+    /**
      * Mouse event handler for the entire pane that constitutes the ExpressionEditor
      */
     private class MouseEventHandler implements EventHandler<MouseEvent> {
@@ -38,6 +49,9 @@ public class ExpressionEditor extends Application {
          * @return The expression that was clicked or null if nothing was clicked
          */
         private Expression findClickedExpression(double X, double Y) {
+            if (focusExpression instanceof LiteralExpression) {
+                return rootExpression;
+            }
             CompoundExpressionAb currentFocusCompound = (CompoundExpressionAb) focusExpression;
             for (Expression expression : currentFocusCompound.getChildren()) {
                 // Get the width and height of the hbox
@@ -52,7 +66,7 @@ public class ExpressionEditor extends Application {
                     return expression;
                 }
             }
-            return null;
+            return rootExpression;
         }
 
         double mouseLocationOnClickX, mouseLocationOnClickY;
@@ -64,27 +78,33 @@ public class ExpressionEditor extends Application {
          * @param event
          */
         public void handle(MouseEvent event) {
+            mouseLocationOnClickX = event.getSceneX();
+            mouseLocationOnClickY = event.getSceneY();
+
             if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
+                if (shouldClick) shouldClick = false;
+                else {
+                    shouldClick = true;
+                    return;
+                }
                 if (focusExpression == null) {
                     focusExpression = rootExpression;
                 }
-                mouseLocationOnClickX = event.getSceneX();
-                mouseLocationOnClickY = event.getSceneY();
                 Expression tmpExpression = findClickedExpression(mouseLocationOnClickX, mouseLocationOnClickY);
-
                 if (tmpExpression != null) {
                     focusExpression = tmpExpression;
                     setBorder(tmpExpression);
-//                    orgTranslateX = ((Pane) (event.getSource())).getTranslateX();
-//                    orgTranslateY = ((Pane) (event.getSource())).getTranslateY();
                 }
             } else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
-                mouseLocationOnClickX = event.getSceneX();
-                mouseLocationOnClickY = event.getSceneY();
+
                 Expression tmpExpression = findClickedExpression(mouseLocationOnClickX, mouseLocationOnClickY);
-//                System.out.println("We are here");
-//                double offsetX = event.getSceneX() - mouseLocationOnClickX;
-//                double offsetY = event.getSceneY() - mouseLocationOnClickY;
+                if (tmpExpression != null) {
+                    focusExpression = tmpExpression;
+                }
+                double offsetX = event.getSceneX() - mouseLocationOnClickX;
+                double offsetY = event.getSceneY() - mouseLocationOnClickY;
+                focusExpression.getNode().setTranslateX(offsetX);
+                focusExpression.getNode().setTranslateY(offsetY);
 //                double newTranslateX = orgTranslateX + offsetX;
 //                double newTranslateY = orgTranslateY + offsetY;
 
@@ -167,23 +187,17 @@ public class ExpressionEditor extends Application {
     /**
      * Sets the border to red
      *
-     * @param expToFind
+     * @param exp
      */
-    private void setBorder(Expression expToFind) {
+    private void setBorder(Expression exp) {
         //TODO Work on this rootExpression
-        if (rootExpression instanceof LiteralExpression) {
-            expToFind.getNode().setStyle("-fx-border-style: solid inside;"
-                    + "-fx-border-width: 1;" + "-fx-border-insets: 2;"
+        if (expressionWithborder != null) expressionWithborder.getNode().setStyle(null);
+        if (focusExpression != rootExpression && exp != null) {
+            exp.getNode().setStyle("-fx-border-style: solid inside;"
+                    + "-fx-border-width: 1;"
+                    + "-fx-border-insets: 2;"
                     + "-fx-border-color: red;");
-        } else {
-            CompoundExpressionAb currentFocusCompound = (CompoundExpressionAb) rootExpression;
-            for (Expression expression : currentFocusCompound.getChildren()) {
-                if (expression == expToFind) {
-                    expression.getNode().setStyle("-fx-border-style: solid inside;"
-                            + "-fx-border-width: 1;" + "-fx-border-insets: 2;"
-                            + "-fx-border-color: red;");
-                } else expression.getNode().setStyle(null);
-            }
+            expressionWithborder = exp;
         }
     }
 }

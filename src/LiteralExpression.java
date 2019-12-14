@@ -1,3 +1,4 @@
+import javafx.scene.layout.HBox;
 import javafx.scene.text.Text;
 
 public class LiteralExpression extends ExpressionAb {
@@ -12,7 +13,7 @@ public class LiteralExpression extends ExpressionAb {
      * @param value the value of this LiteralExpression
      */
     public LiteralExpression(String value) {
-        super(new Text(value));
+        super(new HBox(new Text(value)));
         this.value = value;
     }
 
